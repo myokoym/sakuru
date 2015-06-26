@@ -17,6 +17,12 @@ class DatabaseTest < Test::Unit::TestCase
                  @database.search("DatabaseTest"))
   end
 
+  def test_search_not_match
+    @database.add(__FILE__)
+    assert_equal({},
+                 @database.search("\0"))
+  end
+
   def test_save
     @database.add(__FILE__)
     file = Tempfile.new("sakuru")

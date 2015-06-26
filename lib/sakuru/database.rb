@@ -37,6 +37,7 @@ module Sakuru
       results = {}
       # TODO: normalize and tokenize.
       ids = @inverted_index[query]
+      return results unless ids
       ids.each do |id|
         file = @files[id]
         results[file] ||= 0
