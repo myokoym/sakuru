@@ -1,5 +1,6 @@
 require "open-uri"
 require "json"
+require "sakuru/tokenizer/bigram"
 
 module Sakuru
   class Database
@@ -22,12 +23,12 @@ module Sakuru
 
       open(path) do |file|
         file.each_line do |line|
-          # TODO: normalize and tokenize.
-          line.split(/\s+/).each do |word|
-            next if word.empty?
-            @inverted_index[word] ||= []
+          # TODO: normalize
+          Tokenizer::Bigram.tokenize(line).each do |token|
+            next if token.empty?
+            @inverted_index[token] ||= []
             # TODO: add position
-            @inverted_index[word] << id
+            @inverted_index[token] << id
           end
         end
       end
@@ -35,8 +36,24 @@ module Sakuru
 
     def search(query)
       results = {}
-      # TODO: normalize and tokenize.
-      ids = @inverted_index[query]
+      # TODO: normalize
+      tokens = Tokenizer::Bigram.tokenize(query)
+      posting_lists = tokens.collect do |token|
+        @inverted_index[token]
+      end
+      ids = nil
+      posting_lists.each do |posting_list|
+        unless posting_list
+          ids = []
+          break
+        end
+        # TODO: check position
+        if ids
+          ids &= posting_list
+        else
+          ids = posting_list
+        end
+      end
       return results unless ids
       ids.each do |id|
         file = @files[id]
