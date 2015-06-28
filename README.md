@@ -14,7 +14,7 @@ require "sakuru"
 db = Sakuru::Database.new
 db.add(file_path)
 db.add(uri)
-db.search(query)
+puts db.search(query)
 db.save(output_path)
 db.load(saved_file_path)
 ```
